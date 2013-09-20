@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Exc</title>
+		<script type="text/javascript" src="data.js"></script>
+		<script type="text/javascript" src="knockout.debug.js"></script>
+		<script type="text/javascript" src="act.js"></script>
+		<script type="text/javascript">
+		function checkall()
+		{
+			var boxes= document.getElementsByClassName("box");
+			for( var i = 0; i<boxes.length; i++)
+			{
+				boxes[i].checked = true;
+			}
+			nextbuttoncheck();
+		}
+		
+		function nextbuttoncheck()
+		{
+			var boxes= document.getElementsByClassName("box");
+			var all = true;
+			for( var i = 0; i<boxes.length; i++)
+			{
+				if( !boxes[i].checked )
+					all = false;
+			}
+			if(all)
+			{
+				document.getElementById("save").disabled = false;
+			}
+		}
+
+		function saveday()
+		{
+			if( typeof(localStorage) !== undefined )
+				localStorage.setItem( "numberofdays", _model.days() +1);
+		}
+		</script>
+	</head>
+	<body>
+		<h1>TODO</h1>
+		<p><em data-bind="text: days"></em></p>
+		<ul data-bind="foreach:activities">
+			<li style="list-style:none">
+				<label data-bind="ifnot: br">
+					<input class="box" onclick="nextbuttoncheck()" type="checkbox"/><span data-bind="text:data"></span>
+				</label>
+				<span data-bind="if: br">&nbsp;</span>
+			</li>
+		</ul>
+		<button id="checkall" onclick="checkall()">All</button>
+		<button id="save" disabled="disabled" onclick="saveday()">Done</button>
+		<script type="text/javascript">
+		var days = 0;
+		if( typeof(localStorage) !== undefined )
+		{
+			var tmp =localStorage.getItem( "numberofdays" );
+			if(tmp===undefined || isNaN(tmp))
+				days = 1;
+			else
+				days = parseInt(tmp,10 );
+		}
+		var _model = {
+			activities: ko.observableArray([]),
+			days: ko.observable(days)
+		};
+		for( var i =0;i<activities.length; i++ )
+		{
+			_model.activities.push( {data:activities[i].getMessageOfTheDay(days),br:activities[i].br} );
+		}
+		ko.applyBindings( _model );
+		</script>
+	</body>
+</html>
